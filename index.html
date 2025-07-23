@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Memória SCTD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        .game-container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 90%;
+            width: 600px; /* Max width for larger screens */
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 25px;
+            font-size: 1.2em;
+            color: #555;
+        }
+
+        .score-board div {
+            background-color: #eef2f6;
+            padding: 10px 20px;
+            border-radius: 15px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 15px;
+            background-color: #dbe4eb;
+            border-radius: 15px;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .card {
+            width: 100%;
+            padding-bottom: 100%; /* Makes cards square */
+            position: relative;
+            border-radius: 15px;
+            cursor: pointer;
+            perspective: 1000px;
+            transition: transform 0.6s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none; /* Prevent text selection */
+        }
+
+        .card-inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+        }
+
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 15px;
+            overflow: hidden; /* Ensure images don't spill out */
+        }
+
+        .card-face img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Scale image to fit, maintaining aspect ratio */
+            border-radius: 15px;
+            /* Ensure images are not distorted if their aspect ratio differs from the card */
+        }
+
+        .card-front {
+            background-color: #3498db; /* Default card front background color */
+            transform: rotateY(180deg);
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .card-back {
+            background-color: #2ecc71; /* Card back color */
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+        }
+
+        .card.matched .card-front {
+            background-color: #27ae60; /* Matched card color */
+        }
+
+        .card.matched {
+            pointer-events: none; /* Disable clicks on matched cards */
+            opacity: 0.8;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .reset-button {
+            background: linear-gradient(145deg, #f39c12, #e67e22);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            margin-top: 30px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .reset-button:hover {
+            background: linear-gradient(145deg, #e67e22, #f39c12);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .reset-button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 15px;
+            z-index: 1000;
+            font-size: 1.5em;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            display: none; /* Hidden by default */
+        }
+
+        .message-box button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .message-box button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.8em;
+            }
+            .score-board {
+                font-size: 1em;
+                gap: 15px;
+            }
+            .game-board {
+                gap: 10px;
+                grid-template-columns: repeat(4, 1fr); /* Still 4 columns for mobile */
+            }
+            .reset-button {
+                padding: 10px 20px;
+                font-size: 1em;
+            }
+            .message-box {
+                font-size: 1.2em;
+                padding: 20px 30px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .game-container {
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .score-board {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Jogo da Memória SCTD</h1>
+        <div class="score-board">
+            <div>Pares Encontrados: <span id="matched-pairs">0</span></div>
+            <div>Tentativas: <span id="attempts">0</span></div>
+        </div>
+        <div class="game-board" id="game-board">
+            <!-- Cards will be dynamically inserted here -->
+        </div>
+        <button class="reset-button" id="reset-button">Reiniciar Jogo</button>
+    </div>
+
+    <div id="message-box" class="message-box">
+        <p id="message-text"></p>
+        <button id="message-button">OK</button>
+    </div>
+
+    <script>
+        // Defina as URLs das suas imagens aqui.
+        // Você precisará hospedar as suas imagens online (por exemplo, no GitHub, Imgur, Cloudinary)
+        // e depois substituir estas URLs de placeholder pelas suas.
+        const cardsData = [
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-01.png?token=GHSAT0AAAAAADH44XXGPGWXSLNKYBFWJYHQ2EBFJJQ', id: 'lixo-amarelo' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-02.png?token=GHSAT0AAAAAADH44XXG6X67XCYPFGVUXLRO2EBFJNA', id: 'lixo-verde' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-03.png?token=GHSAT0AAAAAADH44XXG5DYDKLXMOYWO4V7Y2EBFJPA', id: 'lixo-azul' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-04.png?token=GHSAT0AAAAAADH44XXHS3L76WAK5U6RDDOG2EBFJQQ', id: 'lixo-vermelho' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-05.png?token=GHSAT0AAAAAADH44XXG7PL3VSETAP7FFXTA2EBFJRQ', id: 'lampada' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-06.png?token=GHSAT0AAAAAADH44XXGPG6ROKBFWZTY35PA2EBFJTA', id: 'terra' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-07.png?token=GHSAT0AAAAAADH44XXHGI4QTWVX2WMTEXSS2EBFJVA', id: 'planta' },
+            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-08.png?token=GHSAT0AAAAAADH44XXHUPNSCFNQMW6DMJ4O2EBFJWQ', id: 'gotas-agua' }
+        ];
+
+        // URL da imagem para o verso de todas as cartas (a imagem sem cores)
+        const cardBackImageUrl = 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd.png?token=GHSAT0AAAAAADH44XXGUMRMIT2GVKGXTPB42EBFFMA
+';
+
+        let gameBoard = document.getElementById('game-board');
+        let matchedPairsSpan = document.getElementById('matched-pairs');
+        let attemptsSpan = document.getElementById('attempts');
+        let resetButton = document.getElementById('reset-button');
+        let messageBox = document.getElementById('message-box');
+        let messageText = document.getElementById('message-text');
+        let messageButton = document.getElementById('message-button');
+
+        let cards = [];
+        let flippedCards = [];
+        let matchedPairs = 0;
+        let attempts = 0;
+        let lockBoard = false; // Para evitar múltiplas viradas durante uma verificação
+
+        // Função para mostrar uma caixa de mensagem personalizada
+        function showMessageBox(message) {
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+        }
+
+        // Função para esconder a caixa de mensagem personalizada
+        function hideMessageBox() {
+            messageBox.style.display = 'none';
+        }
+
+        // Função para embaralhar o array (Fisher-Yates)
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Inicializa o tabuleiro do jogo
+        function initializeGame() {
+            // Cria pares de cartas
+            cards = [...cardsData, ...cardsData];
+            shuffle(cards);
+
+            gameBoard.innerHTML = ''; // Limpa as cartas existentes
+            flippedCards = [];
+            matchedPairs = 0;
+            attempts = 0;
+            lockBoard = false;
+
+            matchedPairsSpan.textContent = matchedPairs;
+            attemptsSpan.textContent = attempts;
+
+            cards.forEach((cardData, index) => {
+                const cardElement = document.createElement('div');
+                cardElement.classList.add('card');
+                cardElement.dataset.id = cardData.id;
+                cardElement.dataset.index = index; // Armazena o índice original para rastreamento
+
+                cardElement.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-face card-back">
+                            <img src="${cardBackImageUrl}" alt="Verso da Carta" onerror="this.src='https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd.png?token=GHSAT0AAAAAADH44XXGUMRMIT2GVKGXTPB42EBFFMA
+'">
+                        </div>
+                        <div class="card-face card-front">
+                            <img src="${cardData.imageUrl}" alt="${cardData.id}" onerror="this.src='https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd.png?token=GHSAT0AAAAAADH44XXGUMRMIT2GVKGXTPB42EBFFMA
+'">
+                        </div>
+                    </div>
+                `;
+                cardElement.addEventListener('click', flipCard);
+                gameBoard.appendChild(cardElement);
+            });
+        }
+
+        function flipCard(event) {
+            if (lockBoard) return; // Se o tabuleiro estiver bloqueado, não faz nada
+            const clickedCard = event.currentTarget;
+
+            // Previne virar cartas já combinadas ou já viradas
+            if (clickedCard.classList.contains('flipped') || clickedCard.classList.contains('matched')) {
+                return;
+            }
+
+            clickedCard.classList.add('flipped');
+            flippedCards.push(clickedCard);
+
+            if (flippedCards.length === 2) {
+                attempts++;
+                attemptsSpan.textContent = attempts;
+                lockBoard = true; // Bloqueia o tabuleiro depois que duas cartas são viradas
+                checkForMatch();
+            }
+        }
+
+        function checkForMatch() {
+            const [card1, card2] = flippedCards;
+            const isMatch = card1.dataset.id === card2.dataset.id;
+
+            if (isMatch) {
+                disableCards();
+            } else {
+                unflipCards();
+            }
+        }
+
+        function disableCards() {
+            flippedCards.forEach(card => {
+                card.classList.add('matched');
+                card.removeEventListener('click', flipCard);
+            });
+            matchedPairs++;
+            matchedPairsSpan.textContent = matchedPairs;
+            resetBoard();
+
+            if (matchedPairs === cardsData.length) {
+                setTimeout(() => {
+                    showMessageBox(`Parabéns! Você encontrou todos os ${matchedPairs} pares em ${attempts} tentativas!`);
+                }, 500);
+            }
+        }
+
+        function unflipCards() {
+            setTimeout(() => {
+                flippedCards.forEach(card => {
+                    card.classList.remove('flipped');
+                });
+                resetBoard();
+            }, 1000); // As cartas ficam viradas por 1 segundo antes de desvirar
+        }
+
+        function resetBoard() {
+            [flippedCards, lockBoard] = [[], false];
+        }
+
+        // Listeners de eventos
+        resetButton.addEventListener('click', initializeGame);
+        messageButton.addEventListener('click', hideMessageBox);
+
+        // Inicializa o jogo ao carregar a janela
+        window.onload = initializeGame;
+
+    </script>
+</body>
+</html>
