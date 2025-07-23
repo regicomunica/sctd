@@ -13,7 +13,7 @@
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            background-color: #f0f4f8;
+            background-color: #f0ffef; /* Light green background */
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
@@ -109,27 +109,26 @@
             height: 100%;
             object-fit: contain; /* Scale image to fit, maintaining aspect ratio */
             border-radius: 15px;
-            /* Ensure images are not distorted if their aspect ratio differs from the card */
         }
 
         .card-front {
-            background-color: #3498db; /* Default card front background color */
+            background-color: #f7f7f7; /* Light background for card front */
             transform: rotateY(180deg);
             box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
         }
 
         .card-back {
-            background-color: #2ecc71; /* Card back color */
+            background-color: #a8dadc; /* Softer blue for card back */
             box-shadow: 0 5px 10px rgba(0,0,0,0.2);
         }
 
         .card.matched .card-front {
-            background-color: #27ae60; /* Matched card color */
+            background-color: #81c784; /* Softer green for matched cards */
         }
 
         .card.matched {
             pointer-events: none; /* Disable clicks on matched cards */
-            opacity: 0.8;
+            opacity: 0.7; /* Slightly more transparent */
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
 
@@ -250,22 +249,22 @@
 
     <script>
         // Defina as URLs das suas imagens aqui.
-        // Você precisará hospedar as suas imagens online (por exemplo, no GitHub, Imgur, Cloudinary)
-        // e depois substituir estas URLs de placeholder pelas suas.
+        // Com base no seu URL do GitHub Pages, o repositório é 'sctd'.
+        // As imagens estão na raiz do repositório.
+        // Substitua 'regicomunica' pelo seu nome de usuário do GitHub.
         const cardsData = [
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-01.png?token=GHSAT0AAAAAADH44XXGPGWXSLNKYBFWJYHQ2EBFJJQ', id: 'lixo-amarelo' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-02.png?token=GHSAT0AAAAAADH44XXG6X67XCYPFGVUXLRO2EBFJNA', id: 'lixo-verde' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-03.png?token=GHSAT0AAAAAADH44XXG5DYDKLXMOYWO4V7Y2EBFJPA', id: 'lixo-azul' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-04.png?token=GHSAT0AAAAAADH44XXHS3L76WAK5U6RDDOG2EBFJQQ', id: 'lixo-vermelho' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-05.png?token=GHSAT0AAAAAADH44XXG7PL3VSETAP7FFXTA2EBFJRQ', id: 'lampada' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-06.png?token=GHSAT0AAAAAADH44XXGPG6ROKBFWZTY35PA2EBFJTA', id: 'terra' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-07.png?token=GHSAT0AAAAAADH44XXHGI4QTWVX2WMTEXSS2EBFJVA', id: 'planta' },
-            { imageUrl: 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd-08.png?token=GHSAT0AAAAAADH44XXHUPNSCFNQMW6DMJ4O2EBFJWQ', id: 'gotas-agua' }
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-01.png', id: 'lixo-amarelo' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-02.png', id: 'lixo-verde' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-03.png', id: 'lixo-azul' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-04.png', id: 'lixo-vermelho' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-05.png', id: 'lampada' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-06.png', id: 'terra' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-07.png', id: 'planta' },
+            { imageUrl: 'https://regicomunica.github.io/sctd/game-sctd-08.png', id: 'gotas-agua' }
         ];
 
         // URL da imagem para o verso de todas as cartas (a imagem sem cores)
-        const cardBackImageUrl = 'https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd.png?token=GHSAT0AAAAAADH44XXGUMRMIT2GVKGXTPB42EBFFMA
-';
+        const cardBackImageUrl = 'https://regicomunica.github.io/sctd/game-sctd.png';
 
         let gameBoard = document.getElementById('game-board');
         let matchedPairsSpan = document.getElementById('matched-pairs');
@@ -325,12 +324,10 @@
                 cardElement.innerHTML = `
                     <div class="card-inner">
                         <div class="card-face card-back">
-                            <img src="${cardBackImageUrl}" alt="Verso da Carta" onerror="this.src='https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd.png?token=GHSAT0AAAAAADH44XXGUMRMIT2GVKGXTPB42EBFFMA
-'">
+                            <img src="${cardBackImageUrl}" alt="Verso da Carta" onerror="this.src='https://placehold.co/100x100/cccccc/000000?text=?'">
                         </div>
                         <div class="card-face card-front">
-                            <img src="${cardData.imageUrl}" alt="${cardData.id}" onerror="this.src='https://raw.githubusercontent.com/regicomunica/osnildo.com/127e1999c4b5034a68fbb0efbee03687266726f9/game-sctd.png?token=GHSAT0AAAAAADH44XXGUMRMIT2GVKGXTPB42EBFFMA
-'">
+                            <img src="${cardData.imageUrl}" alt="${cardData.id}" onerror="this.src='https://placehold.co/100x100/FF0000/FFFFFF?text=Erro'">
                         </div>
                     </div>
                 `;
